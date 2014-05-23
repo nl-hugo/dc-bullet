@@ -1,0 +1,139 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<title>Bullet chart extension for dc.js</title>
+
+<meta charset="UTF-8">
+
+<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="css/dc.css" />
+
+<style>
+body {
+	font-family: sans-serif;
+	padding-top: 70px;
+}
+
+.dc-chart g.row {
+	opacity: .7;
+}
+
+.dc-chart .marker {
+	stroke: #000;
+	stroke-width: 2px;
+}
+</style>
+
+</head>
+<body>
+
+	<div class="block">
+		<div class="container">
+			<div class="row bottom-buffer">
+				<div class="col-md-12">
+
+					<div id="simple-bullet-chart">
+						<h3>
+							Bullets <small><a class="reset"
+								href="javascript:bulletChart.filterAll();dc.redrawAll();"
+								style="display: none;">reset</a></small>
+						</h3>
+						<p>
+							<small>Bullet chart based on dc.js rowchart. </small>
+						</p>
+						<div class="clearfix"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+
+	<script type="text/javascript" src="js/bootstrap.min.js"></script>
+
+	<script type="text/javascript" src="js/d3.v3.min.js"></script>
+
+	<script type="text/javascript" src="js/crossfilter.v1.min.js"></script>
+
+	<script type="text/javascript" src="js/dc.min.js"></script>
+
+	<script type="text/javascript" src="js/dc.bullet.js"></script>
+
+	<script type="text/javascript" src="js/colorbrewer.v1.min.js"></script>
+
+
+	<script type="text/javascript">
+	
+		var bulletChart = dc.bulletChart( "#simple-bullet-chart" );
+		
+		var colors = (colorbrewer.PuBu[8]).reverse(); // darkest color first
+
+		d3.json("data/bullets.json", function (data) {
+			
+			var ndx = crossfilter(data);
+			var all = ndx.groupAll();
+			    
+			var titleDim = ndx.dimension(function (d) {
+				return d.title;
+			});
+			
+			
+		    function reduceAdd(p, v) {
+		    	  ++p.count;
+		    	  p.quantity += +v.quantity;
+		    	  p.target += +v.target;
+		    	  return p;
+		    	}
+
+		    	function reduceRemove(p, v) {
+		    	  --p.count;
+		    	  p.quantity -= +v.quantity;
+		    	  p.target -= +v.target;
+		    	  return p;
+		    	}
+
+		    	function reduceInitial() {
+		    	  return {count: 0, quantity: 0, target: 0};
+		    	}
+			
+			var titleGroup = titleDim.group().reduce(reduceAdd, reduceRemove, reduceInitial);
+
+			
+			bulletChart.width(360)
+			    .height(130)
+			    .margins({top: 20, left: 10, right: 10, bottom: 20})
+			    .group(titleGroup)
+			    .dimension(titleDim)
+			    .markerAccessor( function(d) {
+			    	return d.value.target / d.value.count;
+			    })
+			    .valueAccessor( function(d) {
+			    	return d.value.quantity;
+			    })
+			    .keyAccessor( function(d) {
+			    	return d.key;
+			    })
+			    // assign colors to each value in the x scale domain
+			    .ordinalColors( colors )
+			    .label(function (d) {
+			        return d.key;
+			    })
+			    // title sets the row text
+			    .title(function (d) {
+			        return d.value.quantity;
+			    })
+			    .elasticX(true)
+			    .xAxis()
+			    .ticks(6);
+
+			// render charts
+		    dc.renderAll();
+		});
+	</script>
+
+</body>
+</html>
