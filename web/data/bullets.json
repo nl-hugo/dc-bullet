@@ -1,0 +1,11 @@
+[
+  {"title":"Revenue","quantity":150,"target":250},
+  {"title":"Revenue","quantity":30,"target":250},
+  {"title":"Revenue","quantity":45,"target":250},
+  {"title":"Profit","quantity":170,"target":230},
+  {"title":"Profit","quantity":100,"target":230},
+  {"title":"Profit","quantity":60,"target":230},
+  {"title":"Order Size","quantity":330,"target":550},
+  {"title":"Order Size","quantity":31,"target":550},
+  {"title":"Order Size","quantity":88,"target":550}  
+]
